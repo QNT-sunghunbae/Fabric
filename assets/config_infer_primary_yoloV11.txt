@@ -1,0 +1,32 @@
+[property]
+gpu-id=0
+net-scale-factor=0.0039215697906911373
+
+
+# ONNX 모델 경로
+onnx-file=best.pt.onnx
+model-engine-file=best.pt.onnx_b1_gpu0_fp16.engine
+
+# 라벨 파일
+labelfile-path=labels2.txt
+
+# 커스텀 파서 라이브러리
+custom-lib-path=libnvdsinfer_custom_impl_Yolo.so
+parse-bbox-func-name=NvDsInferParseYolo
+
+# 배치 설정
+batch-size=1
+network-mode=2
+num-detected-classes=80
+interval=1
+gie-unique-id=1
+network-type=0
+
+# NMS 설정
+cluster-mode=2
+maintain-aspect-ratio=1
+
+[class-attrs-all]
+nms-iou-threshold=0.15
+pre-cluster-threshold=0.75
+topk=300

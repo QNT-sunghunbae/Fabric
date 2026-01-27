@@ -1,0 +1,32 @@
+# .gitignore
+
+# 컴파일 및 빌드 폴더
+build/
+bin/
+*.o
+*.obj
+*.so
+*.a
+*.exe
+
+# Qt Creator 설정 파일 (개인 설정이므로 업로드 X)
+*.user
+*.user.*
+
+# CMake 자동 생성 파일
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# 임시 파일 및 로그
+*.log
+*.tmp
+*.csv
+*.jpg
+*.png
+!assets/*.png  # assets 폴더 내 이미지는 허용하고 싶다면 예외 처리
+
+# OS 생성 파일
+.DS_Store
+Thumbs.db
