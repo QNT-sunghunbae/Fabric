@@ -33,7 +33,16 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/timeline-v12 _site
           mkdir -p /tmp/timeline-v12 _site/timeline
-          cat timeline/payload/site.zip.b64.part* | base64 -d > /tmp/timeline-v12/site.zip
+          echo 'Payload diagnostics:'
+          for f in timeline/payload/site.zip.b64.part*; do
+            printf '%s bytes=' "$f"
+            wc -c < "$f"
+            printf 'blob='
+            git hash-object "$f"
+          done
+          cat timeline/payload/site.zip.b64.part* | base64 --ignore-garbage -d > /tmp/timeline-v12/site.zip
+          echo 'Rebuilt SHA256:'
+          sha256sum /tmp/timeline-v12/site.zip
           echo "b36fb9db55d726d83aa30e6a88dced1f118a7ff140427795996cccebf5a171f8  /tmp/timeline-v12/site.zip" | sha256sum -c -
           unzip -t /tmp/timeline-v12/site.zip
           unzip -q /tmp/timeline-v12/site.zip -d /tmp/timeline-v12/unpacked
