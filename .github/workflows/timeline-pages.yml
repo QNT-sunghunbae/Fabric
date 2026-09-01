@@ -1,0 +1,66 @@
+name: Deploy Timeline Visualizer
+
+on:
+  push:
+    branches: [gh-pages]
+    paths:
+      - 'timeline/**'
+      - '.github/workflows/timeline-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: timeline-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rebuild and verify v12
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/timeline-v12 _site
+          mkdir -p /tmp/timeline-v12 _site/timeline
+          cat timeline/payload/site.zip.b64.part* | base64 -d > /tmp/timeline-v12/site.zip
+          echo "b36fb9db55d726d83aa30e6a88dced1f118a7ff140427795996cccebf5a171f8  /tmp/timeline-v12/site.zip" | sha256sum -c -
+          unzip -t /tmp/timeline-v12/site.zip
+          unzip -q /tmp/timeline-v12/site.zip -d /tmp/timeline-v12/unpacked
+          cp -a /tmp/timeline-v12/unpacked/timeline-web-service-final-v12/. _site/timeline/
+          cat > _site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="ko">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta http-equiv="refresh" content="0; url=./timeline/">
+            <title>Timeline Route Visualizer</title>
+          </head>
+          <body>
+            <p><a href="./timeline/">Timeline Route Visualizer 열기</a></p>
+          </body>
+          </html>
+          HTML
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
